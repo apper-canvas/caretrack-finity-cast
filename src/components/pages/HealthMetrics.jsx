@@ -274,7 +274,7 @@ const getMetricStats = () => {
       )}
 
       {/* Type Filter */}
-      <div className="flex flex-wrap gap-2">
+<div className="flex flex-wrap gap-2">
         {metricTypes.map((type) => (
           <Button
             key={type.value}
@@ -282,7 +282,6 @@ const getMetricStats = () => {
             size="small"
             onClick={() => setSelectedMetricType(type.value)}
             className="flex items-center space-x-2"
-className="flex items-center space-x-2"
           >
             <ApperIcon name={type.icon} size={16} />
             <span>{type.label}</span>
@@ -293,6 +292,7 @@ className="flex items-center space-x-2"
             )}
           </Button>
         ))}
+      </div>
 
       {/* Metrics List */}
       {filteredMetrics.length === 0 ? (

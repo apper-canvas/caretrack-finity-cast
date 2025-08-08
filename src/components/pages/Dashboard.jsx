@@ -218,11 +218,12 @@ const getNextAppointment = () => {
               </Button>
             </div>
 
-            {todayAppointments.length === 0 ? (
+{todayAppointments.length === 0 ? (
               <div className="text-center py-6">
                 <ApperIcon name="Calendar" size={32} className="text-surface-400 mx-auto mb-2" />
                 <p className="text-sm text-surface-600">No appointments today</p>
-) : (
+              </div>
+            ) : (
               <div className="space-y-3">
                 {todayAppointments.map((appointment) => (
                   <div key={appointment.Id} className="p-3 bg-surface-50 rounded-lg">

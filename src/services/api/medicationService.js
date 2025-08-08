@@ -244,6 +244,4 @@ class MedicationService {
     }
   }
 }
-
-export default new MedicationService();
 export default new MedicationService();
