@@ -20,7 +20,7 @@ const Header = () => {
     return false;
   };
 
-  return (
+return (
     <header className="sticky top-0 z-50 w-full border-b border-surface-100 bg-white/95 backdrop-blur-sm">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex h-16 items-center justify-between">
@@ -51,11 +51,22 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Emergency Button */}
-          <div className="hidden lg:block">
+          {/* Right side buttons */}
+          <div className="hidden lg:flex items-center space-x-2">
             <Button variant="danger" size="small">
               <ApperIcon name="Phone" size={16} className="mr-2" />
               Emergency
+            </Button>
+            <Button 
+              variant="outline" 
+              size="small"
+              onClick={() => {
+                const { ApperUI } = window.ApperSDK;
+                ApperUI.logout();
+              }}
+            >
+              <ApperIcon name="LogOut" size={16} className="mr-2" />
+              Logout
             </Button>
           </div>
         </div>

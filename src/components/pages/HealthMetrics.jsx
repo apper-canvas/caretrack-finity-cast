@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
-import Button from "@/components/atoms/Button";
-import Card from "@/components/atoms/Card";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { format, subDays, subMonths, subWeeks } from "date-fns";
+import Chart from "react-apexcharts";
+import healthMetricService from "@/services/api/healthMetricService";
+import ApperIcon from "@/components/ApperIcon";
 import MetricCard from "@/components/molecules/MetricCard";
 import MetricModal from "@/components/organisms/MetricModal";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import { toast } from "react-toastify";
-import { format, subDays, subWeeks, subMonths } from "date-fns";
-import Chart from "react-apexcharts";
-import healthMetricService from "@/services/api/healthMetricService";
+import Button from "@/components/atoms/Button";
+import Select from "@/components/atoms/Select";
+import Card from "@/components/atoms/Card";
 
 const HealthMetrics = () => {
   const [metrics, setMetrics] = useState([]);
@@ -84,16 +85,15 @@ const HealthMetrics = () => {
     }
   };
 
-  const getFilteredMetrics = () => {
+const getFilteredMetrics = () => {
     if (selectedMetricType === "all") return metrics;
-    return metrics.filter(metric => metric.type === selectedMetricType);
+    return metrics.filter(metric => (metric.type_c || metric.type) === selectedMetricType);
   };
 
-  const getChartData = (metricType) => {
+const getChartData = (metricType) => {
     const typeMetrics = metrics
-      .filter(metric => metric.type === metricType)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
-
+      .filter(metric => (metric.type_c || metric.type) === metricType)
+      .sort((a, b) => new Date(a.date_c || a.date) - new Date(b.date_c || b.date));
     let dateRange;
     switch (chartTimeRange) {
       case "week":
@@ -107,16 +107,16 @@ const HealthMetrics = () => {
         break;
       default:
         dateRange = subWeeks(new Date(), 1);
-    }
+}
 
-    const filteredMetrics = typeMetrics.filter(metric => new Date(metric.date) >= dateRange);
+    const filteredMetrics = typeMetrics.filter(metric => new Date(metric.date_c || metric.date) >= dateRange);
 
     return {
       series: [{
-        name: metricType.replace("_", " "),
+name: metricType.replace("_", " "),
         data: filteredMetrics.map(metric => ({
-          x: new Date(metric.date).getTime(),
-          y: parseFloat(metric.value)
+          x: new Date(metric.date_c || metric.date).getTime(),
+          y: parseFloat(metric.value_c || metric.value)
         }))
       }],
       options: {
@@ -155,24 +155,26 @@ const HealthMetrics = () => {
     };
   };
 
-  const getMetricStats = () => {
+const getMetricStats = () => {
     const stats = {};
     metricTypes.slice(1).forEach(type => {
-      const typeMetrics = metrics.filter(metric => metric.type === type.value);
+      const typeMetrics = metrics.filter(metric => (metric.type_c || metric.type) === type.value);
       const recentMetrics = typeMetrics
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .sort((a, b) => new Date(b.date_c || b.date) - new Date(a.date_c || a.date))
         .slice(0, 7);
       
       if (recentMetrics.length > 0) {
         const latest = recentMetrics[0];
-        const average = recentMetrics.reduce((sum, metric) => sum + parseFloat(metric.value), 0) / recentMetrics.length;
+        const latestValue = latest.value_c || latest.value;
+        const latestUnit = latest.unit_c || latest.unit;
+        const average = recentMetrics.reduce((sum, metric) => sum + parseFloat(metric.value_c || metric.value), 0) / recentMetrics.length;
         
         stats[type.value] = {
-          latest: latest.value + " " + latest.unit,
-          average: average.toFixed(1) + " " + latest.unit,
+          latest: latestValue + " " + latestUnit,
+          average: average.toFixed(1) + " " + latestUnit,
           count: typeMetrics.length,
           trend: recentMetrics.length > 1 ? 
-            (parseFloat(latest.value) > parseFloat(recentMetrics[1].value) ? "up" : "down") : null
+            (parseFloat(latestValue) > parseFloat(recentMetrics[1].value_c || recentMetrics[1].value) ? "up" : "down") : null
         };
       }
     });
@@ -260,7 +262,7 @@ const HealthMetrics = () => {
             </div>
           </div>
 
-          {selectedMetricType !== "all" && metrics.filter(m => m.type === selectedMetricType).length > 0 ? (
+{selectedMetricType !== "all" && metrics.filter(m => (m.type_c || m.type) === selectedMetricType).length > 0 ? (
             <Chart {...getChartData(selectedMetricType)} />
           ) : (
             <div className="text-center py-8">
@@ -280,17 +282,17 @@ const HealthMetrics = () => {
             size="small"
             onClick={() => setSelectedMetricType(type.value)}
             className="flex items-center space-x-2"
+className="flex items-center space-x-2"
           >
             <ApperIcon name={type.icon} size={16} />
             <span>{type.label}</span>
             {type.value !== "all" && (
               <span className="text-xs opacity-75">
-                ({metrics.filter(m => m.type === type.value).length})
+                ({metrics.filter(m => (m.type_c || m.type) === type.value).length})
               </span>
             )}
           </Button>
         ))}
-      </div>
 
       {/* Metrics List */}
       {filteredMetrics.length === 0 ? (

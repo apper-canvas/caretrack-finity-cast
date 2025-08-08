@@ -15,16 +15,16 @@ const AppointmentModal = ({ isOpen, onClose, onSubmit, appointment = null }) => 
     notes: ""
   });
 
-  useEffect(() => {
+useEffect(() => {
     if (appointment) {
       setFormData({
-        title: appointment.title || "",
-        provider: appointment.provider || "",
-        location: appointment.location || "",
-        date: appointment.date || "",
-        time: appointment.time || "",
-        type: appointment.type || "routine",
-        notes: appointment.notes || ""
+        title: appointment.title_c || appointment.title || appointment.Name || "",
+        provider: appointment.provider_c || appointment.provider || "",
+        location: appointment.location_c || appointment.location || "",
+        date: appointment.date_c || appointment.date || "",
+        time: appointment.time_c || appointment.time || "",
+        type: appointment.type_c || appointment.type || "routine",
+        notes: appointment.notes_c || appointment.notes || ""
       });
     } else {
       setFormData({

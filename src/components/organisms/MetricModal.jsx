@@ -22,15 +22,15 @@ const MetricModal = ({ isOpen, onClose, onSubmit, metric = null }) => {
     { value: "heart_rate", label: "Heart Rate", unit: "bpm", placeholder: "70" }
   ];
 
-  useEffect(() => {
+useEffect(() => {
     if (metric) {
       setFormData({
-        type: metric.type || "blood_pressure",
-        value: metric.value || "",
-        unit: metric.unit || "",
-        date: metric.date || "",
-        time: metric.time || "",
-        notes: metric.notes || ""
+        type: metric.type_c || metric.type || "blood_pressure",
+        value: metric.value_c || metric.value || "",
+        unit: metric.unit_c || metric.unit || "",
+        date: metric.date_c || metric.date || "",
+        time: metric.time_c || metric.time || "",
+        notes: metric.notes_c || metric.notes || ""
       });
     } else {
       const today = new Date();

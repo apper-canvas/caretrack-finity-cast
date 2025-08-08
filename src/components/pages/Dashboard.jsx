@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import StatCard from "@/components/molecules/StatCard";
-import MedicationCard from "@/components/molecules/MedicationCard";
-import AppointmentCard from "@/components/molecules/AppointmentCard";
-import Button from "@/components/atoms/Button";
-import Card from "@/components/atoms/Card";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { format, isToday, isTomorrow } from "date-fns";
 import medicationService from "@/services/api/medicationService";
+import medicationLogService from "@/services/api/medicationLogService";
 import appointmentService from "@/services/api/appointmentService";
 import healthMetricService from "@/services/api/healthMetricService";
-import medicationLogService from "@/services/api/medicationLogService";
+import ApperIcon from "@/components/ApperIcon";
+import MedicationCard from "@/components/molecules/MedicationCard";
+import StatCard from "@/components/molecules/StatCard";
+import AppointmentCard from "@/components/molecules/AppointmentCard";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
 
 const Dashboard = () => {
   const [medications, setMedications] = useState([]);
@@ -52,14 +52,13 @@ const Dashboard = () => {
 
   const handleLogMedication = async (medicationId, scheduledTime) => {
     try {
-      const newLog = {
-        medicationId: medicationId.toString(),
-        scheduledTime,
-        takenTime: format(new Date(), "HH:mm"),
-        status: "taken",
-        date: format(new Date(), "yyyy-MM-dd")
+const newLog = {
+        medication_id_c: parseInt(medicationId),
+        scheduled_time_c: scheduledTime,
+        taken_time_c: format(new Date(), "HH:mm"),
+        status_c: "taken",
+        date_c: format(new Date(), "yyyy-MM-dd")
       };
-
       await medicationLogService.create(newLog);
       const updatedLogs = await medicationLogService.getAll();
       setMedicationLogs(updatedLogs);
@@ -73,36 +72,57 @@ const Dashboard = () => {
   if (loading) return <Loading type="stats" />;
   if (error) return <Error message={error} onRetry={loadData} />;
 
-  const todayMedications = medications.filter(med => med.times && med.times.length > 0).slice(0, 3);
-  const todayAppointments = appointments.filter(app => isToday(new Date(app.date)));
+// Filter medications with times and handle database field structure
+  const todayMedications = medications.filter(med => {
+    const times = typeof med.times_c === 'string' ? 
+      med.times_c.split(',').map(t => t.trim()).filter(t => t) : 
+      (med.times_c || med.times || []);
+    return times.length > 0;
+  }).slice(0, 3);
+  
+  const todayAppointments = appointments.filter(app => 
+    isToday(new Date(app.date_c || app.date))
+  );
+  
   const upcomingAppointments = appointments
-    .filter(app => new Date(app.date) >= new Date() && !isToday(new Date(app.date)))
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .filter(app => {
+      const appDate = new Date(app.date_c || app.date);
+      return appDate >= new Date() && !isToday(appDate);
+    })
+    .sort((a, b) => new Date(a.date_c || a.date) - new Date(b.date_c || b.date))
     .slice(0, 2);
+    
   const recentMetrics = metrics
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .sort((a, b) => new Date(b.date_c || b.date) - new Date(a.date_c || a.date))
     .slice(0, 3);
 
   const getTodayMedicationAdherence = () => {
     const todayLogs = medicationLogs.filter(log => 
-      format(new Date(), "yyyy-MM-dd") === format(new Date(log.date), "yyyy-MM-dd")
+      format(new Date(), "yyyy-MM-dd") === format(new Date(log.date_c || log.date), "yyyy-MM-dd")
     );
-    const takenLogs = todayLogs.filter(log => log.status === "taken");
-    const totalScheduled = medications.reduce((sum, med) => sum + (med.times?.length || 0), 0);
+    const takenLogs = todayLogs.filter(log => (log.status_c || log.status) === "taken");
+    
+    const totalScheduled = medications.reduce((sum, med) => {
+      const times = typeof med.times_c === 'string' ? 
+        med.times_c.split(',').map(t => t.trim()).filter(t => t) : 
+        (med.times_c || med.times || []);
+      return sum + times.length;
+    }, 0);
     
     if (totalScheduled === 0) return 0;
     return Math.round((takenLogs.length / totalScheduled) * 100);
   };
 
-  const getNextAppointment = () => {
+const getNextAppointment = () => {
     const upcoming = appointments
-      .filter(app => new Date(app.date) >= new Date())
-      .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+      .filter(app => new Date(app.date_c || app.date) >= new Date())
+      .sort((a, b) => new Date(a.date_c || a.date) - new Date(b.date_c || b.date))[0];
     
     if (!upcoming) return "None scheduled";
-    if (isToday(new Date(upcoming.date))) return "Today";
-    if (isTomorrow(new Date(upcoming.date))) return "Tomorrow";
-    return format(new Date(upcoming.date), "MMM dd");
+    const upcomingDate = new Date(upcoming.date_c || upcoming.date);
+    if (isToday(upcomingDate)) return "Today";
+    if (isTomorrow(upcomingDate)) return "Tomorrow";
+    return format(upcomingDate, "MMM dd");
   };
 
   return (
@@ -202,15 +222,14 @@ const Dashboard = () => {
               <div className="text-center py-6">
                 <ApperIcon name="Calendar" size={32} className="text-surface-400 mx-auto mb-2" />
                 <p className="text-sm text-surface-600">No appointments today</p>
-              </div>
-            ) : (
+) : (
               <div className="space-y-3">
                 {todayAppointments.map((appointment) => (
                   <div key={appointment.Id} className="p-3 bg-surface-50 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-surface-900">{appointment.title}</p>
-                        <p className="text-sm text-surface-600">{appointment.time}</p>
+                        <p className="font-medium text-surface-900">{appointment.title_c || appointment.title || appointment.Name}</p>
+                        <p className="text-sm text-surface-600">{appointment.time_c || appointment.time}</p>
                       </div>
                       <ApperIcon name="Clock" size={16} className="text-surface-400" />
                     </div>
@@ -221,6 +240,7 @@ const Dashboard = () => {
           </Card>
 
           {/* Upcoming Appointments */}
+          {/* Upcoming Appointments */}
           <Card className="p-6">
             <h3 className="text-lg font-bold font-display text-surface-900 mb-4">Upcoming</h3>
             
@@ -228,15 +248,15 @@ const Dashboard = () => {
               <div className="text-center py-4">
                 <p className="text-sm text-surface-600">No upcoming appointments</p>
               </div>
-            ) : (
+) : (
               <div className="space-y-3">
                 {upcomingAppointments.map((appointment) => (
                   <div key={appointment.Id} className="p-3 bg-surface-50 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-surface-900">{appointment.title}</p>
+                        <p className="font-medium text-surface-900">{appointment.title_c || appointment.title || appointment.Name}</p>
                         <p className="text-sm text-surface-600">
-                          {format(new Date(appointment.date), "MMM dd")} at {appointment.time}
+                          {format(new Date(appointment.date_c || appointment.date), "MMM dd")} at {appointment.time_c || appointment.time}
                         </p>
                       </div>
                       <ApperIcon name="ChevronRight" size={16} className="text-surface-400" />
@@ -246,7 +266,6 @@ const Dashboard = () => {
               </div>
             )}
           </Card>
-
           {/* Recent Health Metrics */}
           <Card className="p-6">
             <h3 className="text-lg font-bold font-display text-surface-900 mb-4">Recent Metrics</h3>
@@ -255,21 +274,21 @@ const Dashboard = () => {
               <div className="text-center py-4">
                 <p className="text-sm text-surface-600">No recent metrics</p>
               </div>
-            ) : (
+) : (
               <div className="space-y-3">
                 {recentMetrics.map((metric) => (
                   <div key={metric.Id} className="p-3 bg-surface-50 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium text-surface-900 capitalize">
-                          {metric.type.replace("_", " ")}
+                          {(metric.type_c || metric.type)?.replace("_", " ")}
                         </p>
                         <p className="text-sm text-surface-600">
-                          {metric.value} {metric.unit}
+                          {metric.value_c || metric.value} {metric.unit_c || metric.unit}
                         </p>
                       </div>
                       <span className="text-xs text-surface-500">
-                        {format(new Date(metric.date), "MMM dd")}
+                        {format(new Date(metric.date_c || metric.date), "MMM dd")}
                       </span>
                     </div>
                   </div>

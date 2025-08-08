@@ -7,21 +7,28 @@ import { format } from "date-fns";
 
 const MedicationCard = ({ medication, logs = [], onLogTaken, onEdit }) => {
   const todayLogs = logs.filter(log => 
-    log.medicationId === medication.Id && 
-    format(new Date(), "yyyy-MM-dd") === format(new Date(log.date), "yyyy-MM-dd")
+    (log.medication_id_c === medication.Id || log.medicationId === medication.Id) && 
+    format(new Date(), "yyyy-MM-dd") === format(new Date(log.date_c || log.date), "yyyy-MM-dd")
   );
 
   const getNextDose = () => {
     const now = new Date();
     const currentTime = format(now, "HH:mm");
     
-    return medication.times.find(time => time > currentTime) || medication.times[0];
+    // Handle times_c as comma-separated string or array
+    const times = typeof medication.times_c === 'string' ? 
+      medication.times_c.split(',').map(t => t.trim()) : 
+      (medication.times_c || medication.times || []);
+    
+    return times.find(time => time > currentTime) || times[0];
   };
 
   const getDoseStatus = (time) => {
-    const log = todayLogs.find(log => log.scheduledTime === time);
+    const log = todayLogs.find(log => 
+      (log.scheduled_time_c || log.scheduledTime) === time
+    );
     if (!log) return "pending";
-    return log.status;
+    return log.status_c || log.status;
   };
 
   const getPillColor = (index) => {
@@ -35,6 +42,11 @@ const MedicationCard = ({ medication, logs = [], onLogTaken, onEdit }) => {
     return colors[index % colors.length];
   };
 
+  // Handle times_c as comma-separated string or array
+  const times = typeof medication.times_c === 'string' ? 
+    medication.times_c.split(',').map(t => t.trim()) : 
+    (medication.times_c || medication.times || []);
+
   return (
     <Card hover className="p-6">
       <div className="flex items-start justify-between mb-4">
@@ -43,8 +55,8 @@ const MedicationCard = ({ medication, logs = [], onLogTaken, onEdit }) => {
             <div className="w-8 h-6 bg-white bg-opacity-20 rounded-full"></div>
           </div>
           <div>
-            <h3 className="text-lg font-bold font-display text-surface-900">{medication.name}</h3>
-            <p className="text-sm text-surface-600">{medication.dosage}</p>
+            <h3 className="text-lg font-bold font-display text-surface-900">{medication.Name || medication.name}</h3>
+            <p className="text-sm text-surface-600">{medication.dosage_c || medication.dosage}</p>
           </div>
         </div>
         <Button
@@ -64,14 +76,14 @@ const MedicationCard = ({ medication, logs = [], onLogTaken, onEdit }) => {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-surface-700">Frequency:</span>
-          <span className="text-sm text-surface-600">{medication.frequency}</span>
+          <span className="text-sm text-surface-600">{medication.frequency_c || medication.frequency}</span>
         </div>
       </div>
 
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-surface-700">Today's Schedule</h4>
         <div className="flex flex-wrap gap-2">
-          {medication.times.map((time, index) => {
+          {times.map((time, index) => {
             const status = getDoseStatus(time);
             return (
               <div key={index} className="flex items-center space-x-2">
@@ -101,12 +113,12 @@ const MedicationCard = ({ medication, logs = [], onLogTaken, onEdit }) => {
         </div>
       </div>
 
-      {medication.refillDate && new Date(medication.refillDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
+      {(medication.refill_date_c || medication.refillDate) && new Date(medication.refill_date_c || medication.refillDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
         <div className="mt-4 p-3 bg-gradient-to-r from-amber-50 to-amber-25 border border-amber-200 rounded-lg">
           <div className="flex items-center space-x-2">
             <ApperIcon name="AlertTriangle" size={16} className="text-amber-600" />
             <span className="text-sm font-medium text-amber-800">
-              Refill needed by {format(new Date(medication.refillDate), "MMM dd")}
+              Refill needed by {format(new Date(medication.refill_date_c || medication.refillDate), "MMM dd")}
             </span>
           </div>
         </div>

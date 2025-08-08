@@ -81,12 +81,12 @@ const Medications = () => {
 
   const handleLogMedication = async (medicationId, scheduledTime) => {
     try {
-      const newLog = {
-        medicationId: medicationId.toString(),
-        scheduledTime,
-        takenTime: new Date().toTimeString().slice(0, 5),
-        status: "taken",
-        date: new Date().toISOString().split("T")[0]
+const newLog = {
+        medication_id_c: parseInt(medicationId),
+        scheduled_time_c: scheduledTime,
+        taken_time_c: new Date().toTimeString().slice(0, 5),
+        status_c: "taken",
+        date_c: new Date().toISOString().split("T")[0]
       };
 
       await medicationLogService.create(newLog);
@@ -99,12 +99,17 @@ const Medications = () => {
     }
   };
 
-  const filteredMedications = medications.filter(medication => {
+const filteredMedications = medications.filter(medication => {
     if (filterType === "all") return true;
-    if (filterType === "active") return !medication.endDate || new Date(medication.endDate) >= new Date();
+    
+    const endDate = medication.end_date_c || medication.endDate;
+    if (filterType === "active") return !endDate || new Date(endDate) >= new Date();
+    
+    const refillDate = medication.refill_date_c || medication.refillDate;
     if (filterType === "refill_needed") {
-      return medication.refillDate && new Date(medication.refillDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      return refillDate && new Date(refillDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
+    
     return true;
   });
 

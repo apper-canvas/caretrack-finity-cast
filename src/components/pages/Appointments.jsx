@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import Button from "@/components/atoms/Button";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { format, isFuture, isPast, isToday } from "date-fns";
+import appointmentService from "@/services/api/appointmentService";
+import ApperIcon from "@/components/ApperIcon";
 import AppointmentCard from "@/components/molecules/AppointmentCard";
 import AppointmentModal from "@/components/organisms/AppointmentModal";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import { toast } from "react-toastify";
-import { format, isToday, isFuture, isPast } from "date-fns";
-import appointmentService from "@/services/api/appointmentService";
+import Button from "@/components/atoms/Button";
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -72,22 +72,28 @@ const Appointments = () => {
     }
   };
 
-  const getFilteredAppointments = () => {
+const getFilteredAppointments = () => {
     const now = new Date();
     
     switch (viewType) {
       case "today":
-        return appointments.filter(app => isToday(new Date(app.date)));
+        return appointments.filter(app => isToday(new Date(app.date_c || app.date)));
       case "upcoming":
         return appointments
-          .filter(app => isFuture(new Date(app.date)) || isToday(new Date(app.date)))
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
+          .filter(app => {
+            const appDate = new Date(app.date_c || app.date);
+            return isFuture(appDate) || isToday(appDate);
+          })
+          .sort((a, b) => new Date(a.date_c || a.date) - new Date(b.date_c || b.date));
       case "past":
         return appointments
-          .filter(app => isPast(new Date(app.date)) && !isToday(new Date(app.date)))
-          .sort((a, b) => new Date(b.date) - new Date(a.date));
+          .filter(app => {
+            const appDate = new Date(app.date_c || app.date);
+            return isPast(appDate) && !isToday(appDate);
+          })
+          .sort((a, b) => new Date(b.date_c || b.date) - new Date(a.date_c || a.date));
       default:
-        return appointments.sort((a, b) => new Date(a.date) - new Date(b.date));
+        return appointments.sort((a, b) => new Date(a.date_c || a.date) - new Date(b.date_c || b.date));
     }
   };
 
@@ -155,27 +161,26 @@ const Appointments = () => {
 
       {/* Quick Stats */}
       {viewType === "upcoming" && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gradient-to-r from-blue-50 to-blue-25 border border-blue-200 rounded-xl p-4">
             <div className="flex items-center space-x-3">
               <ApperIcon name="Calendar" size={24} className="text-blue-600" />
               <div>
                 <p className="text-sm text-blue-700 font-medium">Today's Appointments</p>
                 <p className="text-2xl font-bold text-blue-900">
-                  {appointments.filter(app => isToday(new Date(app.date))).length}
+                  {appointments.filter(app => isToday(new Date(app.date_c || app.date))).length}
                 </p>
               </div>
             </div>
           </div>
-          
-          <div className="bg-gradient-to-r from-emerald-50 to-emerald-25 border border-emerald-200 rounded-xl p-4">
+<div className="bg-gradient-to-r from-emerald-50 to-emerald-25 border border-emerald-200 rounded-xl p-4">
             <div className="flex items-center space-x-3">
               <ApperIcon name="Clock" size={24} className="text-emerald-600" />
               <div>
                 <p className="text-sm text-emerald-700 font-medium">This Week</p>
                 <p className="text-2xl font-bold text-emerald-900">
                   {appointments.filter(app => {
-                    const appDate = new Date(app.date);
+                    const appDate = new Date(app.date_c || app.date);
                     const weekFromNow = new Date();
                     weekFromNow.setDate(weekFromNow.getDate() + 7);
                     return appDate >= new Date() && appDate <= weekFromNow;
@@ -187,11 +192,14 @@ const Appointments = () => {
 
           <div className="bg-gradient-to-r from-purple-50 to-purple-25 border border-purple-200 rounded-xl p-4">
             <div className="flex items-center space-x-3">
-              <ApperIcon name="Users" size={24} className="text-purple-600" />
+<ApperIcon name="Users" size={24} className="text-purple-600" />
               <div>
                 <p className="text-sm text-purple-700 font-medium">Total Upcoming</p>
                 <p className="text-2xl font-bold text-purple-900">
-                  {appointments.filter(app => isFuture(new Date(app.date)) || isToday(new Date(app.date))).length}
+                  {appointments.filter(app => {
+                    const appDate = new Date(app.date_c || app.date);
+                    return isFuture(appDate) || isToday(appDate);
+                  }).length}
                 </p>
               </div>
             </div>

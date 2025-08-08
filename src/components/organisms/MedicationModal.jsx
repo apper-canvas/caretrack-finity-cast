@@ -16,23 +16,28 @@ const MedicationModal = ({ isOpen, onClose, onSubmit, medication = null }) => {
     notes: ""
   });
 
-  useEffect(() => {
+useEffect(() => {
     if (medication) {
+      // Handle times_c as comma-separated string or array
+      const times = typeof medication.times_c === 'string' ? 
+        medication.times_c.split(',').map(t => t.trim()).filter(t => t) : 
+        (medication.times_c || medication.times || [""]);
+      
       setFormData({
-        name: medication.name || "",
-        dosage: medication.dosage || "",
-        frequency: medication.frequency || "",
-        times: medication.times || [""],
-        startDate: medication.startDate || "",
-        endDate: medication.endDate || "",
-        refillDate: medication.refillDate || "",
-        notes: medication.notes || ""
+        name: medication.Name || medication.name || "",
+        dosage: medication.dosage_c || medication.dosage || "",
+        frequency: medication.frequency_c || medication.frequency || "",
+        times: times.length > 0 ? times : [""],
+        startDate: medication.start_date_c || medication.startDate || "",
+        endDate: medication.end_date_c || medication.endDate || "",
+        refillDate: medication.refill_date_c || medication.refillDate || "",
+        notes: medication.notes_c || medication.notes || ""
       });
     } else {
       setFormData({
         name: "",
         dosage: "",
-        frequency: "Daily",
+        frequency: "Once daily",
         times: ["08:00"],
         startDate: "",
         endDate: "",

@@ -27,26 +27,42 @@ const MetricCard = ({ metric, onEdit, onDelete }) => {
     return colors[type] || "from-gray-500 to-gray-600";
   };
 
+  const metricType = metric.type_c || metric.type;
+  const metricValue = metric.value_c || metric.value;
+  const metricUnit = metric.unit_c || metric.unit;
+  const metricDate = metric.date_c || metric.date;
+  const metricTime = metric.time_c || metric.time;
+  const metricNotes = metric.notes_c || metric.notes;
+
   const formatValue = (value, type) => {
     if (type === "blood_pressure") {
       return value; // Assuming format like "120/80"
     }
-    return `${value} ${metric.unit}`;
+    return `${value} ${metricUnit}`;
+  };
+
+  const formatDateTime = () => {
+    const date = new Date(metricDate);
+    if (metricTime) {
+      const [hours, minutes] = metricTime.split(':');
+      date.setHours(parseInt(hours), parseInt(minutes));
+    }
+    return format(date, "MMM dd, yyyy 'at' h:mm a");
   };
 
   return (
     <Card hover className="p-6">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className={`p-3 bg-gradient-to-br ${getMetricColor(metric.type)} rounded-xl`}>
-            <ApperIcon name={getMetricIcon(metric.type)} size={24} className="text-white" />
+          <div className={`p-3 bg-gradient-to-br ${getMetricColor(metricType)} rounded-xl`}>
+            <ApperIcon name={getMetricIcon(metricType)} size={24} className="text-white" />
           </div>
           <div>
             <h3 className="text-lg font-bold font-display text-surface-900 capitalize">
-              {metric.type.replace("_", " ")}
+              {metricType?.replace("_", " ")}
             </h3>
             <p className="text-2xl font-bold text-primary-600">
-              {formatValue(metric.value, metric.type)}
+              {formatValue(metricValue, metricType)}
             </p>
           </div>
         </div>
@@ -74,12 +90,12 @@ const MetricCard = ({ metric, onEdit, onDelete }) => {
         <div className="flex items-center justify-between">
           <span className="text-sm text-surface-600">Recorded:</span>
           <span className="text-sm font-medium text-surface-700">
-            {format(new Date(metric.date), "MMM dd, yyyy 'at' h:mm a")}
+            {formatDateTime()}
           </span>
         </div>
-        {metric.notes && (
+        {metricNotes && (
           <div className="mt-3 p-3 bg-surface-50 rounded-lg">
-            <p className="text-sm text-surface-700">{metric.notes}</p>
+            <p className="text-sm text-surface-700">{metricNotes}</p>
           </div>
         )}
       </div>
