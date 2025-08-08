@@ -1,0 +1,66 @@
+[
+  {
+    "Id": 1,
+    "medicationId": "1",
+    "scheduledTime": "08:00",
+    "takenTime": "08:15",
+    "status": "taken",
+    "date": "2024-02-01"
+  },
+  {
+    "Id": 2,
+    "medicationId": "2",
+    "scheduledTime": "08:00",
+    "takenTime": "08:30",
+    "status": "taken",
+    "date": "2024-02-01"
+  },
+  {
+    "Id": 3,
+    "medicationId": "2",
+    "scheduledTime": "20:00",
+    "takenTime": null,
+    "status": "missed",
+    "date": "2024-01-31"
+  },
+  {
+    "Id": 4,
+    "medicationId": "3",
+    "scheduledTime": "22:00",
+    "takenTime": "22:10",
+    "status": "taken",
+    "date": "2024-01-31"
+  },
+  {
+    "Id": 5,
+    "medicationId": "4",
+    "scheduledTime": "08:00",
+    "takenTime": "08:00",
+    "status": "taken",
+    "date": "2024-02-01"
+  },
+  {
+    "Id": 6,
+    "medicationId": "5",
+    "scheduledTime": "07:30",
+    "takenTime": "07:45",
+    "status": "taken",
+    "date": "2024-02-01"
+  },
+  {
+    "Id": 7,
+    "medicationId": "1",
+    "scheduledTime": "08:00",
+    "takenTime": "08:20",
+    "status": "taken",
+    "date": "2024-01-31"
+  },
+  {
+    "Id": 8,
+    "medicationId": "2",
+    "scheduledTime": "08:00",
+    "takenTime": "08:10",
+    "status": "taken",
+    "date": "2024-01-31"
+  }
+]

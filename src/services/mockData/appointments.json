@@ -1,0 +1,62 @@
+[
+  {
+    "Id": 1,
+    "title": "Annual Physical Exam",
+    "provider": "Dr. Sarah Johnson",
+    "location": "Primary Care Clinic",
+    "date": "2024-02-15",
+    "time": "10:00",
+    "type": "routine",
+    "notes": "Bring insurance card and medication list"
+  },
+  {
+    "Id": 2,
+    "title": "Cardiology Follow-up",
+    "provider": "Dr. Michael Chen",
+    "location": "Heart Center",
+    "date": "2024-02-08",
+    "time": "14:30",
+    "type": "followup",
+    "notes": "Review recent EKG results"
+  },
+  {
+    "Id": 3,
+    "title": "Blood Work",
+    "provider": "Quest Diagnostics",
+    "location": "Lab Services Center",
+    "date": "2024-02-05",
+    "time": "08:00",
+    "type": "lab",
+    "notes": "Fasting required - no food or drink after midnight"
+  },
+  {
+    "Id": 4,
+    "title": "Diabetic Eye Exam",
+    "provider": "Dr. Lisa Park",
+    "location": "Ophthalmology Associates",
+    "date": "2024-02-20",
+    "time": "11:15",
+    "type": "specialist",
+    "notes": "Pupils will be dilated - bring sunglasses"
+  },
+  {
+    "Id": 5,
+    "title": "Urgent Care Visit",
+    "provider": "Dr. Robert Kim",
+    "location": "Urgent Care Center",
+    "date": "2024-01-28",
+    "time": "16:45",
+    "type": "urgent",
+    "notes": "Flu-like symptoms, fever monitoring"
+  },
+  {
+    "Id": 6,
+    "title": "Medication Review",
+    "provider": "Dr. Sarah Johnson",
+    "location": "Primary Care Clinic",
+    "date": "2024-03-01",
+    "time": "09:30",
+    "type": "routine",
+    "notes": "Review current medications and dosages"
+  }
+]

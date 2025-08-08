@@ -1,0 +1,92 @@
+[
+  {
+    "Id": 1,
+    "type": "blood_pressure",
+    "value": "120/80",
+    "unit": "mmHg",
+    "date": "2024-02-01",
+    "time": "08:00",
+    "notes": "Morning reading before medication"
+  },
+  {
+    "Id": 2,
+    "type": "glucose",
+    "value": "95",
+    "unit": "mg/dL",
+    "date": "2024-02-01",
+    "time": "08:15",
+    "notes": "Fasting glucose level"
+  },
+  {
+    "Id": 3,
+    "type": "weight",
+    "value": "175",
+    "unit": "lbs",
+    "date": "2024-02-01",
+    "time": "07:30",
+    "notes": "Morning weight after bathroom"
+  },
+  {
+    "Id": 4,
+    "type": "blood_pressure",
+    "value": "118/78",
+    "unit": "mmHg",
+    "date": "2024-01-31",
+    "time": "19:00",
+    "notes": "Evening reading"
+  },
+  {
+    "Id": 5,
+    "type": "glucose",
+    "value": "110",
+    "unit": "mg/dL",
+    "date": "2024-01-31",
+    "time": "12:30",
+    "notes": "2 hours after lunch"
+  },
+  {
+    "Id": 6,
+    "type": "heart_rate",
+    "value": "68",
+    "unit": "bpm",
+    "date": "2024-02-01",
+    "time": "08:00",
+    "notes": "Resting heart rate"
+  },
+  {
+    "Id": 7,
+    "type": "temperature",
+    "value": "98.6",
+    "unit": "°F",
+    "date": "2024-01-30",
+    "time": "18:00",
+    "notes": "Normal body temperature"
+  },
+  {
+    "Id": 8,
+    "type": "blood_pressure",
+    "value": "122/82",
+    "unit": "mmHg",
+    "date": "2024-01-30",
+    "time": "08:00",
+    "notes": "Slightly elevated, monitor closely"
+  },
+  {
+    "Id": 9,
+    "type": "weight",
+    "value": "174.5",
+    "unit": "lbs",
+    "date": "2024-01-30",
+    "time": "07:30",
+    "notes": "Continuing downward trend"
+  },
+  {
+    "Id": 10,
+    "type": "glucose",
+    "value": "88",
+    "unit": "mg/dL",
+    "date": "2024-01-30",
+    "time": "08:15",
+    "notes": "Excellent fasting level"
+  }
+]
